@@ -77,10 +77,12 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menu
         $videobitrate = get_config('tiny_recordrtc', 'videobitrate');
         $audiotimelimit = get_config('tiny_recordrtc', 'audiotimelimit');
         $videotimelimit = get_config('tiny_recordrtc', 'videotimelimit');
+        $allowedpausing = get_config('tiny_recordrtc', 'allowedpausing');
 
         // Update $allowedtypes to account for capabilities.
         $audioallowed = $allowedtypes === 'audio' || $allowedtypes === 'both';
         $videoallowed = $allowedtypes === 'video' || $allowedtypes === 'both';
+        $pausingallowed = $allowedpausing === '1';
         $audioallowed = $audioallowed && has_capability('tiny/recordrtc:recordaudio', $context);
         $videoallowed = $videoallowed && has_capability('tiny/recordrtc:recordvideo', $context);
         if ($audioallowed && $videoallowed) {
@@ -105,7 +107,8 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menu
             'videobitrate' => $videobitrate,
             'audiotimelimit' => $audiotimelimit,
             'videotimelimit' => $videotimelimit,
-            'maxrecsize' => $maxrecsize
+            'maxrecsize' => $maxrecsize,
+            'allowedpausing' => $pausingallowed,
         ];
 
         $data = [

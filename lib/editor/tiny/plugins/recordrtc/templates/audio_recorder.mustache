@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div data-purpose="player-container" class="row">
+        <div data-purpose="player-container" class="row audio-player-container">
             <div class="col-1"></div>
             <div class="col-10">
                 <audio></audio>
@@ -57,6 +57,11 @@
                 <button class="btn btn-lg btn-outline-danger btn-block" data-action="startstop">
                     {{#str}} startrecording, tiny_recordrtc {{/str}}
                 </button>
+                {{#isallowedpausing}}
+                <button class="d-none btn btn-lg btn-outline-primary col-2 ml-3" data-action="pauseresume">
+                    {{#str}} pause, tiny_recordrtc {{/str}}
+                </button>
+                {{/isallowedpausing}}
             </div>
             <div class="col-1"></div>
         </div>

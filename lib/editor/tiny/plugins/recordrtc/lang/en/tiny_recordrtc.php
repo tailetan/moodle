@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allowedpausing'] = 'Allow pausing';
 $string['allowedtypes'] = 'Recording type';
 $string['allowedtypes_desc'] = 'Which types of recording can be made in the TinyMCE editor? In addition to this setting, there are two capabilities which control access to recording options.';
 $string['attachrecording'] = 'Attach recording';
@@ -55,12 +56,14 @@ $string['insecurealert'] = 'Your browser might not allow this plugin to work unl
 $string['insecurealert_title'] = 'Insecure connection!';
 $string['maxfilesizehit'] = 'You have reached the maximum size limit for file uploads.';
 $string['maxfilesizehit_title'] = 'Recording stopped';
+$string['no'] = 'No';
 $string['norecordingfound'] = 'Something has gone wrong. Nothing has been recorded.';
 $string['norecordingfound_title'] = 'No recording found';
 $string['nowebrtc'] = 'Your browser offers limited or no support for WebRTC technologies yet, and can\'t be used with this plugin. Please switch or upgrade your browser.';
 $string['nowebrtc_title'] = 'WebRTC not supported';
 $string['onlyaudio'] = 'Audio only';
 $string['onlyvideo'] = 'Video only';
+$string['pause'] = 'Pause';
 $string['pluginname'] = 'Tiny RecordRTC';
 $string['privacy:metadata'] = 'The RecordRTC plugin does not store any personal data.';
 $string['recordagain'] = 'Record again';
@@ -70,6 +73,7 @@ $string['recordingfailed'] = 'Recording failed. Try again.';
 $string['recordinguploaded'] = 'Recording uploaded';
 $string['recordrtc:recordaudio'] = 'Record audio in the text editor';
 $string['recordrtc:recordvideo'] = 'Record video in the text editor';
+$string['resume'] = 'Resume';
 $string['startrecording'] = 'Start recording';
 $string['stoprecording'] = 'Stop recording';
 $string['timelimitwarning'] = 'You must enter a number that is greater than 0.';
@@ -85,3 +89,4 @@ $string['videotimelimit'] = 'Video time limit';
 $string['videotimelimit_desc'] = 'Maximum recording length for video clips.';
 $string['videotitle'] = 'Record video';
 $string['helplinktext'] = 'RecordRTC';
+$string['yes'] = 'Yes';

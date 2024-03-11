@@ -31,6 +31,8 @@ $ADMIN->add('editortiny', new admin_category('tiny_recordrtc', new lang_string('
 
 if ($ADMIN->fulltree) {
     $defaulttimelimit = 120;
+    $defaultallowpausing = 0;
+    $allowpausing = 1;
 
     $url = parse_url($CFG->wwwroot);
     $hostname = parse_url($CFG->wwwroot, PHP_URL_HOST);
@@ -93,5 +95,16 @@ if ($ADMIN->fulltree) {
         }
         return '';
     });
+    $settings->add($setting);
+
+    // Pausing allowed.
+    $options = [
+            $allowpausing => new lang_string('yes', 'tiny_recordrtc'),
+            $defaultallowpausing => new lang_string('no', 'tiny_recordrtc'),
+    ];
+
+    $name = get_string('allowedpausing', 'tiny_recordrtc');
+    $setting = new admin_setting_configselect('tiny_recordrtc/allowedpausing', $name,
+            '', 0, $options);
     $settings->add($setting);
 }
