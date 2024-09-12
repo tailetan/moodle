@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024053100;
+$plugin->version   = 2024091200;
 $plugin->requires  = 2024041600;
 $plugin->component = 'tiny_recordrtc';

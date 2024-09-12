@@ -75,6 +75,7 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menu
         $allowedtypes = explode(',', get_config('tiny_recordrtc', 'allowedtypes'));
         $audiobitrate = get_config('tiny_recordrtc', 'audiobitrate');
         $videobitrate = get_config('tiny_recordrtc', 'videobitrate');
+        [$videowidth, $videoheight] = explode(',', get_config('tiny_recordrtc', 'videosize'));
         $screenbitrate = get_config('tiny_recordrtc', 'screenbitrate');
         $audiotimelimit = get_config('tiny_recordrtc', 'audiotimelimit');
         $videotimelimit = get_config('tiny_recordrtc', 'videotimelimit');
@@ -118,6 +119,8 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menu
             'allowedtypes' => $allowedtypes,
             'audiobitrate' => $audiobitrate,
             'videobitrate' => $videobitrate,
+            'videowidth' => $videowidth,
+            'videoheight' => $videoheight,
             'screenbitrate' => $screenbitrate,
             'audiotimelimit' => $audiotimelimit,
             'videotimelimit' => $videotimelimit,

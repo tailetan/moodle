@@ -34,9 +34,48 @@ class constants {
     /** @var string TINYRECORDRTC_SCREEN_TYPE The screen-sharing recording type. */
     public const TINYRECORDRTC_SCREEN_TYPE = 'screen';
 
-    /** @var string TINYRECORDRTC_SCREEN_HD The HD screen-sharing resolution. */
-    public const TINYRECORDRTC_SCREEN_HD = '1280,720';
+    /** @var string TINYRECORDRTC_RES_240_180 240 x 180 resolution (4:3). */
+    public const TINYRECORDRTC_RES_240_180 = '240,180';
 
-    /** @var string TINYRECORDRTC_SCREEN_FHD The Full-HD screen-sharing resolution. */
-    public const TINYRECORDRTC_SCREEN_FHD = '1920,1080';
+    /** @var string TINYRECORDRTC_RES_320_180 320 x 180 resolution (16:9). */
+    public const TINYRECORDRTC_RES_320_180 = '320,180';
+
+    /** @var string TINYRECORDRTC_RES_320_240 320 x 240 resolution (4:3). */
+    public const TINYRECORDRTC_RES_320_240 = '320,240';
+
+    /** @var string TINYRECORDRTC_RES_426_240 426 x 240 resolution (16:9). */
+    public const TINYRECORDRTC_RES_426_240 = '426,240';
+
+    /** @var string TINYRECORDRTC_RES_384_288 384 x 288 resolution (4:3). */
+    public const TINYRECORDRTC_RES_384_288 = '384,288';
+
+    /** @var string TINYRECORDRTC_RES_512_288 512 x 288 resolution (16:9). */
+    public const TINYRECORDRTC_RES_512_288 = '512,288';
+
+    /** @var string TINYRECORDRTC_RES_480_360 480 x 360 resolution (4:3). */
+    public const TINYRECORDRTC_RES_480_360 = '480,360';
+
+    /** @var string TINYRECORDRTC_RES_640_360 640 x 360 resolution (16:9). */
+    public const TINYRECORDRTC_RES_640_360 = '640,360';
+
+    /** @var string TINYRECORDRTC_RES_576_432 576 x 432 resolution (4:3). */
+    public const TINYRECORDRTC_RES_576_432 = '576,432';
+
+    /** @var string TINYRECORDRTC_RES_640_480 640 x 480 resolution (4:3). */
+    public const TINYRECORDRTC_RES_640_480 = '640,480';
+
+    /** @var string TINYRECORDRTC_RES_768_432 768 x 432 resolution (16:9). */
+    public const TINYRECORDRTC_RES_768_432 = '768,432';
+
+    /** @var string TINYRECORDRTC_RES_768_576 768 x 576 resolution (4:3). */
+    public const TINYRECORDRTC_RES_768_576 = '768,576';
+
+    /** @var string TINYRECORDRTC_RES_1280_720 1280 x 720 resolution (16:9). */
+    public const TINYRECORDRTC_RES_1280_720 = '1280,720';
+
+    /** @var string TINYRECORDRTC_RES_1024_768 1024 x 768 resolution (4:3). */
+    public const TINYRECORDRTC_RES_1024_768 = '1024,768';
+
+    /** @var string TINYRECORDRTC_RES_1920_1080 1920 x 1080 (16:9). */
+    public const TINYRECORDRTC_RES_1920_1080 = '1920,1080';
 }
