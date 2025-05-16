@@ -1,0 +1,7 @@
+issueNumber: MDL-82557
+notes:
+  mod_lti:
+    - message: >-
+        There is a new callback function, get_alternative_name(),
+        which allows us to retrieve the tool name.
+      type: improved

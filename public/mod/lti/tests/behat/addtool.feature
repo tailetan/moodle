@@ -142,3 +142,20 @@ Feature: Add tools
     And the "id_instructorchoicesendname" "checkbox" should be disabled
     And the "id_instructorchoicesendemailaddr" "checkbox" should be disabled
     And the "id_instructorchoiceacceptgrades" "checkbox" should be disabled
+
+  @javascript
+  Scenario: Verify External Tool title is set correctly.
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    When I add a "Teaching Tool 1" to section "1" using the activity chooser
+    Then I should see "New Teaching Tool 1"
+    And I should not see "New External tool"
+
+    # Test with long name.
+    And I am on "Course 1" course homepage with editing mode on
+    And the following "mod_lti > tool types" exist:
+      | name                                                                      | baseurl                                   | coursevisible | state |
+      | Lorem Ipsum is simply dummy text of the printing and typesetting industry | /mod/lti/tests/fixtures/tool_provider.php | 2             | 1     |
+    And I add a "Lorem Ipsum is simply dummy text of the printing and typesetting industry" to section "1" using the activity chooser
+    And I should see "New Lorem Ipsum is simply dummy text of the..."
+    And I should not see "New Lorem Ipsum is simply dummy text of the printing and typesetting industry"
