@@ -84,7 +84,8 @@ if (!empty($add)) {
     }
 
     $sectionname = get_section_name($course, $cw);
-    $fullmodulename = get_string('modulename', $module->name);
+    $modulename = get_string('modulename', $module->name);
+    $fullmodulename = shorten_text(component_callback('mod_' . $module->name, 'get_alternative_name', [], $modulename), 42);
     $pageheading = $pagetitle = get_string('addinganew', 'moodle', $fullmodulename);
     $navbaraddition = $pageheading;
 

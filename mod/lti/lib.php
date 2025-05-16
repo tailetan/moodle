@@ -760,3 +760,21 @@ function mod_lti_extend_navigation_course($navigation, $course, $context): void 
         $navigation->add_node($settingsnode);
     }
 }
+
+/**
+ * Retrieves the alternative name of an LTI type based on the provided type ID.
+ *
+ * @return string|null The name of the LTI type, or null if not found.
+ */
+function mod_lti_get_alternative_name() {
+    global $DB;
+
+    $typeid = optional_param('typeid', 0, PARAM_INT);
+
+    if ($typeid === 0) {
+        return null;
+    }
+
+    $record = $DB->get_record('lti_types', ['id' => $typeid], 'name');
+    return $record ? $record->name : null;
+}
