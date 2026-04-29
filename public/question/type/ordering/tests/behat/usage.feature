@@ -128,3 +128,45 @@ Feature: Complete an Ordering question attempt
     And I drag "Environment" to space "6" in the ordering question
     And I press "Check"
     And I should see "Well done!"
+
+  @javascript
+  Scenario: Score details heading is hidden when Grading details is set to Hide.
+    Given quiz "Quiz 1" contains the following questions:
+      | question     | page | maxmark |
+      | ordering-002 | 1    | 2.00    |
+    And I am on the "Quiz 1" "quiz activity" page logged in as "student1"
+    When I click on "Attempt quiz" "button"
+    And I wait until the page is ready
+    # Submit items in wrong order to trigger partial/incorrect feedback.
+    And I drag "Environment" to space "1" in the ordering question
+    And I drag "Learning" to space "2" in the ordering question
+    And I drag "Oriented" to space "3" in the ordering question
+    And I drag "Dynamic" to space "4" in the ordering question
+    And I drag "Object" to space "5" in the ordering question
+    And I drag "Modular" to space "6" in the ordering question
+    And I press "Finish attempt ..."
+    And I press "Submit all and finish"
+    And I click on "Submit all and finish" "button" in the "Submit all your answers and finish?" "dialogue"
+    Then I should not see "Here are the scores for each item in this response:"
+    And I should not see "0 / 1 = 0%"
+
+  @javascript
+  Scenario: Score details heading is shown when Grading details is set to Show.
+    Given quiz "Quiz 1" contains the following questions:
+      | question     | page | maxmark |
+      | ordering-003 | 1    | 2.00    |
+    And I am on the "Quiz 1" "quiz activity" page logged in as "student1"
+    When I click on "Attempt quiz" "button"
+    And I wait until the page is ready
+    # Submit items in wrong order to trigger partial/incorrect feedback.
+    And I drag "Environment" to space "1" in the ordering question
+    And I drag "Learning" to space "2" in the ordering question
+    And I drag "Oriented" to space "3" in the ordering question
+    And I drag "Dynamic" to space "4" in the ordering question
+    And I drag "Object" to space "5" in the ordering question
+    And I drag "Modular" to space "6" in the ordering question
+    And I press "Finish attempt ..."
+    And I press "Submit all and finish"
+    And I click on "Submit all and finish" "button" in the "Submit all your answers and finish?" "dialogue"
+    Then I should see "Here are the scores for each item in this response:"
+    And I should see "0 / 1 = 0%"
