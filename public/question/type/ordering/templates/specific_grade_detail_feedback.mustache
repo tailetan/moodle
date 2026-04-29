@@ -24,6 +24,7 @@
     * gradingtype - Grading type.
     * gradedetails - Total score (percent).
     * orderinglayoutclass - The ordering layout CSS class.
+    * hasscoredetails - Whether score details are available (boolean gate for scoredetails array).
     * scoredetails - An array containing the score details.
 
     Example context (json):
@@ -32,6 +33,7 @@
         "gradingtype": "Grading type: Absolute position",
         "gradedetails": "93",
         "orderinglayoutclass": "vertical",
+        "hasscoredetails": true,
         "scoredetails": [
             {
                 "score": "1",
@@ -59,12 +61,14 @@
             {{totalscore}} / {{totalmaxscore}} = {{gradedetails}}%
         </p>
     {{/gradedetails}}
-    {{#str}} scoredetails, qtype_ordering {{/str}}
-    <ol class="scoredetails">
-        {{#scoredetails}}
-            <li class="{{orderinglayoutclass}}">
-                {{score}} / {{maxscore}} = {{percent}}%
-            </li>
-        {{/scoredetails}}
-    </ol>
+    {{#hasscoredetails}}
+        {{#str}} scoredetails, qtype_ordering {{/str}}
+        <ol class="scoredetails">
+            {{#scoredetails}}
+                <li class="{{orderinglayoutclass}}">
+                    {{score}} / {{maxscore}} = {{percent}}%
+                </li>
+            {{/scoredetails}}
+        </ol>
+    {{/hasscoredetails}}
 {{/showpartialwrong}}
