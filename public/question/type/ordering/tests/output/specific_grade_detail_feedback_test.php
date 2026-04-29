@@ -119,6 +119,7 @@ final class specific_grade_detail_feedback_test extends advanced_testcase {
                     'gradedetails' => 93.0,
                     'totalscore' => 28,
                     'totalmaxscore' => 30,
+                    'hasscoredetails' => true,
                     'scoredetails' => [
                         ['score' => 5, 'maxscore' => 5, 'percent' => 100],
                         ['score' => 5, 'maxscore' => 5, 'percent' => 100],
@@ -141,6 +142,7 @@ final class specific_grade_detail_feedback_test extends advanced_testcase {
                     'gradedetails' => 67.0,
                     'totalscore' => 20,
                     'totalmaxscore' => 30,
+                    'hasscoredetails' => true,
                     'scoredetails' => [
                         ['score' => 4, 'maxscore' => 5, 'percent' => 80],
                         ['score' => 3, 'maxscore' => 5, 'percent' => 60],
@@ -163,6 +165,7 @@ final class specific_grade_detail_feedback_test extends advanced_testcase {
                     'gradedetails' => 20.0,
                     'totalscore' => 1,
                     'totalmaxscore' => 5,
+                    'hasscoredetails' => true,
                     'scoredetails' => [
                         ['score' => 0, 'maxscore' => 1, 'percent' => 0.0],
                         ['score' => 0, 'maxscore' => 1, 'percent' => 0.0],
@@ -185,6 +188,7 @@ final class specific_grade_detail_feedback_test extends advanced_testcase {
                     'gradedetails' => 67.0,
                     'totalscore' => 4,
                     'totalmaxscore' => 6,
+                    'hasscoredetails' => true,
                     'scoredetails' => [
                         ['score' => 1, 'maxscore' => 1, 'percent' => 100.0],
                         ['score' => 1, 'maxscore' => 1, 'percent' => 100.0],

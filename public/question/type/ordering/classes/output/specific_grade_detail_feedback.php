@@ -93,6 +93,7 @@ class specific_grade_detail_feedback extends renderable_base {
                     $data['totalscore'] = $totalscore;
                     $data['totalmaxscore'] = $totalmaxscore;
                 }
+                $data['hasscoredetails'] = !empty($data['scoredetails']);
             }
         }
         return $data;
