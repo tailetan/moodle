@@ -5675,6 +5675,43 @@ class restore_move_module_questions_categories extends restore_execution_step {
         $after35 = $this->task->backup_release_compare('3.5', '>=') && $this->task->backup_version_compare(20180205, '>');
 
         $contexts = restore_dbops::restore_get_question_banks($this->get_restoreid(), CONTEXT_MODULE);
+
+        // Set references of every context in this restore, keyed by the category they use, to be fixed below.
+        $referencesbycategory = [];
+        if ($contexts) {
+            $references = $DB->get_recordset_sql(
+                "SELECT *
+                   FROM {question_set_references}
+                  WHERE usingcontextid IN (
+                            SELECT newitemid
+                              FROM {backup_ids_temp}
+                             WHERE backupid = :backupid
+                                   AND itemname = 'context'
+                        )",
+                ['backupid' => $this->get_restoreid()],
+            );
+            foreach ($references as $reference) {
+                $filtercondition = json_decode($reference->filtercondition, true);
+                if (!is_array($filtercondition)) {
+                    // Data is invalid, cannot process further.
+                    continue;
+                }
+                if (!array_key_exists('filter', $filtercondition)) {
+                    // Convert filter condition if it is in legacy format (pre Moodle 4.3).
+                    $filtercondition = \core_question\question_reference_manager::convert_legacy_set_reference_filter_condition(
+                        $filtercondition,
+                    );
+                }
+                $categoryid = $filtercondition['filter']['category']['values'][0] ?? null;
+                if (!$categoryid) {
+                    // This filter does not restrict on category id so there is no need to update it.
+                    continue;
+                }
+                $referencesbycategory[$categoryid][] = [$reference, $filtercondition];
+            }
+            $references->close();
+        }
+
         foreach ($contexts as $contextid => $contextlevel) {
             if (!$newcontext = restore_dbops::get_backup_ids_record($this->get_restoreid(), 'context', $contextid)) {
                 // The bank for the question categories required by this module was not included in the backup,
@@ -5805,20 +5842,12 @@ class restore_move_module_questions_categories extends restore_execution_step {
                 // So, now, we need to find those, and updated the questioncontextid.
                 // We can only find them by picking apart the filter conditions, and seeign which categories they refer to.
 
-                // We need to check all the question_set_references belonging to this context_module.
-                $references = $DB->get_records('question_set_references', ['usingcontextid' => $newcontext->newitemid]);
-                foreach ($references as $reference) {
-                    $filtercondition = json_decode($reference->filtercondition, true);
-                    if (!array_key_exists('filter', $filtercondition)) {
-                        $filtercondition = \core_question\question_reference_manager::convert_legacy_set_reference_filter_condition(
-                            $filtercondition,
-                        );
-                    }
-                    $questioncategoryid = $filtercondition['filter']['category']['values'][0];
-                    if (in_array($questioncategoryid, $categoryids)) {
+                // The same happens for activities restored before this bank, e.g. a quiz before it in course order.
+                foreach ($categoryids as $categoryid) {
+                    foreach ($referencesbycategory[$categoryid] ?? [] as [$reference, $filtercondition]) {
                         // This is one of ours, update the questionscontextid and filtercondition fields.
                         $reference->questionscontextid = $newcontext->newitemid;
-                        $filtercondition['cat'] = "{$questioncategoryid},{$newcontext->newitemid}";
+                        $filtercondition['cat'] = "{$categoryid},{$newcontext->newitemid}";
                         $reference->filtercondition = json_encode($filtercondition);
                         $DB->update_record('question_set_references', $reference);
                     }

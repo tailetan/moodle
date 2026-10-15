@@ -144,6 +144,49 @@ class question_reference_manager {
     }
 
     /**
+     * Set questionscontextid of set references to the context of the category they use.
+     *
+     * This is intended for use during Moodle upgrade, to repair data from earlier restores, which could leave
+     * questionscontextid on the course context or on the original question bank.
+     * Categories not yet moved to a question bank module (e.g. before the transfer task runs) are skipped.
+     *
+     * @param string $component The component that owns the set references, e.g. 'mod_quiz'.
+     * @return int The number of records that were updated.
+     */
+    public static function fix_set_references_questions_context(string $component): int {
+        global $DB;
+        $updates = 0;
+        // Category id => context id, for categories in a question bank module.
+        $categorycontexts = $DB->get_records_sql_menu(
+            "SELECT qc.id, qc.contextid
+               FROM {question_categories} qc
+               JOIN {context} ctx ON ctx.id = qc.contextid
+              WHERE ctx.contextlevel = :modulelevel",
+            ['modulelevel' => CONTEXT_MODULE],
+        );
+        $sets = $DB->get_recordset('question_set_references', ['component' => $component]);
+        foreach ($sets as $set) {
+            $filtercondition = json_decode($set->filtercondition, true);
+            $categoryid = $filtercondition['filter']['category']['values'][0] ?? $filtercondition['questioncategoryid'] ?? null;
+            $categorycontextid = $categoryid ? ($categorycontexts[$categoryid] ?? null) : null;
+            if (!$categorycontextid || $categorycontextid == $set->questionscontextid) {
+                continue;
+            }
+            // Only update the fields that change.
+            $setchanges = (object) ['id' => $set->id, 'questionscontextid' => $categorycontextid];
+            // Legacy filter conditions have no 'cat'; it is built when they are converted.
+            if (isset($filtercondition['cat'])) {
+                $filtercondition['cat'] = implode(',', [$categoryid, $categorycontextid]);
+                $setchanges->filtercondition = json_encode($filtercondition);
+            }
+            $DB->update_record('question_set_references', $setchanges);
+            $updates++;
+        }
+        $sets->close();
+        return $updates;
+    }
+
+    /**
      * Ensure consistency of filter 'cat' parameter and questioncontextid in all set references.
      *
      * Some set references may have been moved to a different context, but the filter condition not updated with the context ID.

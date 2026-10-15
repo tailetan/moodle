@@ -784,6 +784,72 @@ final class backup_test extends \advanced_testcase {
     }
 
     /**
+     * Random questions from qbanks that come after the quiz in the course should use the restored qbanks.
+     */
+    public function test_quiz_before_bank_random_question_restore_to_new_course(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        self::setAdminUser();
+
+        // The quiz comes before the question banks, so it is restored first.
+        $generator = self::getDataGenerator();
+        $qgen = $generator->get_plugin_generator('core_question');
+        $course = $generator->create_course();
+        $quiz = $generator->create_module('quiz', ['course' => $course->id]);
+        $structure = quiz_settings::create($quiz->id)->get_structure();
+        $categories = [];
+        foreach (['Bank 1', 'Bank 2'] as $name) {
+            $qbank = $generator->create_module('qbank', ['course' => $course->id, 'name' => $name]);
+            $category = $qgen->create_question_category(['contextid' => \context_module::instance($qbank->cmid)->id]);
+            $qgen->create_question('shortanswer', null, ['category' => $category->id]);
+            $structure->add_random_questions(1, 1, [
+                'filter' => [
+                    'category' => [
+                        'jointype' => 1,
+                        'values' => [$category->id],
+                        'filteroptions' => ['includesubcategories' => false],
+                    ],
+                ],
+            ]);
+            $categories[$name] = $category;
+        }
+
+        $backupid = $this->backup_course($course);
+        $newcourse = $generator->create_course();
+        $this->restore_to_course($backupid, $newcourse->id);
+
+        $modinfo = get_fast_modinfo($newcourse);
+        $newquiz = array_values($modinfo->get_instances_of('quiz'))[0];
+        $newstructure = quiz_settings::create($newquiz->instance)->get_structure();
+        $newqbanks = [];
+        foreach ($modinfo->get_instances_of('qbank') as $cm) {
+            $newqbanks[$cm->name] = $cm;
+        }
+        $slot = 1;
+        foreach ($categories as $name => $category) {
+            $newqbank = $newqbanks[$name];
+            $newcategory = $DB->get_record(
+                'question_categories',
+                ['contextid' => $newqbank->context->id, 'stamp' => $category->stamp],
+                '*',
+                MUST_EXIST,
+            );
+            $reference = $DB->get_record('question_set_references', [
+                'usingcontextid' => $newquiz->context->id,
+                'itemid' => $newstructure->get_slot_id_for_slot($slot),
+            ], '*', MUST_EXIST);
+            $filtercondition = json_decode($reference->filtercondition, true);
+            $this->assertEquals([$newcategory->id], $filtercondition['filter']['category']['values']);
+            $this->assertEquals($newqbank->context->id, $reference->questionscontextid);
+            $this->assertEquals("{$newcategory->id},{$newqbank->context->id}", $filtercondition['cat']);
+            $this->assertEquals($newqbank->id, $newstructure->get_source_bank($slot)->cminfo->id);
+            $slot++;
+        }
+        $this->assertCount(2, $newstructure->get_slots());
+    }
+
+    /**
      * The course backup file contains question banks and a quiz module.
      * There is 1 question bank category per deprecated context level i.e. CONTEXT_SYSTEM, CONTEXT_COURSECAT, and CONTEXT_COURSE.
      * The quiz included in the backup uses a question in each category.
