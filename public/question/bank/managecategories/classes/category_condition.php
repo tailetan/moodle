@@ -268,7 +268,7 @@ class category_condition extends condition {
     ): array {
         global $DB;
         // Map category id used for category filter condition and corresponding context id.
-        $oldcategoryid = $filtercondition['filter']['category']['values'][0];
+        $oldcategoryid = $filtercondition['filter']['category']['values'][0] ?? null;
         // Decide if we're going to refer back to the original category, or to the new category.
         // Are we restoring to a different site?
         // Has the original context or category been deleted?
@@ -286,6 +286,19 @@ class category_condition extends condition {
         ) {
             $newcategoryid = $restorestep->get_mappingid('question_category', $oldcategoryid);
             $filtercondition['filter']['category']['values'][0] = $newcategoryid;
+        }
+
+        // Course, category or system banks from older backups are restored into a question bank module,
+        // so use the category's context rather than the mapped course context.
+        if (!$questionscontext || $questionscontext->contextlevel != CONTEXT_MODULE) {
+            $categorycontextid = $DB->get_field(
+                'question_categories',
+                'contextid',
+                ['id' => $filtercondition['filter']['category']['values'][0]],
+            );
+            if ($categorycontextid) {
+                $setreference->questionscontextid = $categorycontextid;
+            }
         }
 
         $filtercondition['cat'] = implode(
