@@ -281,4 +281,65 @@ final class category_condition_test extends \advanced_testcase {
 
         $this->assertEquals($mappedid, $filtercondition['filter']['category']['values'][0]);
     }
+
+    /**
+     * A filter condition without a category value should be restored without errors.
+     */
+    public function test_restore_filtercondition_empty_category(): void {
+        $this->resetAfterTest();
+        $mockstep = $this->get_mock_step($this->get_not_samesite_task());
+        $mockstep->method('get_mappingid')->willReturn(false);
+        $setreference = (object) [
+            'questionscontextid' => \core\context\system::instance()->id,
+            'usingcontextid' => 1,
+        ];
+        $filtercondition = ['filter' => ['category' => ['values' => []]]];
+
+        $filtercondition = (new category_condition())->restore_filtercondition($filtercondition, $setreference, $mockstep);
+
+        $this->assertEmpty($filtercondition['filter']['category']['values'][0]);
+        $this->assertEquals(\core\context\system::instance()->id, $setreference->questionscontextid);
+    }
+
+    /**
+     * A set reference mapped to the course context should use the category's question bank; a module context is kept.
+     */
+    public function test_restore_filtercondition_course_context(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
+        $qbankcontext = module::instance($qbank->cmid);
+        $category = $questiongenerator->create_question_category(['contextid' => $qbankcontext->id]);
+        $oldcategoryid = $category->id + 100;
+        $mockstep = $this->get_mock_step($this->get_not_samesite_task());
+        $mockstep->method('get_mappingid')->willReturn($category->id);
+        $condition = new category_condition();
+
+        // Mapped to the course context.
+        $setreference = (object) [
+            'questionscontextid' => \core\context\course::instance($course->id)->id,
+            'usingcontextid' => $qbankcontext->id + 1,
+        ];
+        $filtercondition = ['filter' => ['category' => ['values' => [$oldcategoryid]]]];
+
+        $filtercondition = $condition->restore_filtercondition($filtercondition, $setreference, $mockstep);
+
+        $this->assertEquals($category->id, $filtercondition['filter']['category']['values'][0]);
+        $this->assertEquals($qbankcontext->id, $setreference->questionscontextid);
+        $this->assertEquals("{$category->id},{$qbankcontext->id}", $filtercondition['cat']);
+
+        // Mapped to a module context.
+        $otherqbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
+        $otherqbankcontext = module::instance($otherqbank->cmid);
+        $setreference = (object) [
+            'questionscontextid' => $otherqbankcontext->id,
+            'usingcontextid' => $qbankcontext->id + 1,
+        ];
+        $filtercondition = ['filter' => ['category' => ['values' => [$oldcategoryid]]]];
+
+        $condition->restore_filtercondition($filtercondition, $setreference, $mockstep);
+
+        $this->assertEquals($otherqbankcontext->id, $setreference->questionscontextid);
+    }
 }
