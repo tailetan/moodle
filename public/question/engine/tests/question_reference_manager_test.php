@@ -122,6 +122,84 @@ final class question_reference_manager_test extends advanced_testcase {
     }
 
     /**
+     * Set references should be pointed at the question bank module of their category.
+     */
+    public function test_fix_set_references_questions_context(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        /** @var core_question_generator $questiongenerator */
+        $questiongenerator = $generator->get_plugin_generator('core_question');
+        $course = $generator->create_course();
+        $coursecontext = \context_course::instance($course->id);
+        $qbank = $generator->create_module('qbank', ['course' => $course->id]);
+        $qbankcontext = \context_module::instance($qbank->cmid);
+        $otherqbank = $generator->create_module('qbank', ['course' => $course->id]);
+        $otherqbankcontext = \context_module::instance($otherqbank->cmid);
+        $category = $questiongenerator->create_question_category(['contextid' => $qbankcontext->id]);
+        // A course bank category the transfer task has not moved yet.
+        $coursecategory = (object) [
+            'name' => 'Not transferred yet',
+            'contextid' => $coursecontext->id,
+            'info' => '',
+            'infoformat' => FORMAT_HTML,
+            'stamp' => make_unique_id_code(),
+            'parent' => 0,
+            'sortorder' => 999,
+        ];
+        $coursecategory->id = $DB->insert_record('question_categories', $coursecategory);
+
+        $filtercondition = fn(int $categoryid, int $contextid) => json_encode([
+            'filter' => [
+                'category' => [
+                    'jointype' => 1,
+                    'values' => [$categoryid],
+                    'filteroptions' => ['includesubcategories' => false],
+                ],
+            ],
+            'cat' => "{$categoryid},{$contextid}",
+        ]);
+        $reference = fn(int $itemid, int $questionscontextid, string $filtercondition, string $component = 'mod_quiz') => (object) [
+            'usingcontextid' => 1,
+            'component' => $component,
+            'questionarea' => 'slot',
+            'itemid' => $itemid,
+            'questionscontextid' => $questionscontextid,
+            'filtercondition' => $filtercondition,
+        ];
+
+        $correct = $reference(1, $qbankcontext->id, $filtercondition($category->id, $qbankcontext->id));
+        // Legacy filter condition on the course context, e.g. restored from a course bank in a 4.x backup.
+        $brokenlegacy = $reference(
+            2,
+            $coursecontext->id,
+            json_encode(['questioncategoryid' => (string) $category->id, 'includingsubcategories' => '0']),
+        );
+        // Another question bank, e.g. the original bank after restoring a quiz before its bank.
+        $brokenotherbank = $reference(3, $otherqbankcontext->id, $filtercondition($category->id, $otherqbankcontext->id));
+        $pending = $reference(4, $coursecontext->id, $filtercondition($coursecategory->id, $coursecontext->id));
+        $othercomponent = $reference(5, $coursecontext->id, $filtercondition($category->id, $coursecontext->id), 'core_question');
+        foreach ([$correct, $brokenlegacy, $brokenotherbank, $pending, $othercomponent] as $record) {
+            $record->id = $DB->insert_record('question_set_references', $record);
+        }
+
+        $this->assertEquals(2, question_reference_manager::fix_set_references_questions_context('mod_quiz'));
+
+        $this->assertEquals($correct, $DB->get_record('question_set_references', ['id' => $correct->id]));
+        $this->assertEquals($pending, $DB->get_record('question_set_references', ['id' => $pending->id]));
+        $this->assertEquals($othercomponent, $DB->get_record('question_set_references', ['id' => $othercomponent->id]));
+
+        $fixedlegacy = $DB->get_record('question_set_references', ['id' => $brokenlegacy->id]);
+        $this->assertEquals($qbankcontext->id, $fixedlegacy->questionscontextid);
+        $this->assertEquals($brokenlegacy->filtercondition, $fixedlegacy->filtercondition);
+
+        $fixedotherbank = $DB->get_record('question_set_references', ['id' => $brokenotherbank->id]);
+        $this->assertEquals($qbankcontext->id, $fixedotherbank->questionscontextid);
+        $this->assertEquals("{$category->id},{$qbankcontext->id}", json_decode($fixedotherbank->filtercondition, true)['cat']);
+    }
+
+    /**
      * Any question set references where questioncategoryid does not match filtercondition['cat'] should have the cat updated.
      *
      * @todo Deprecate in Moodle 6.0 (MDL-87844) for removal in 7.0 (MDL-87845).

@@ -135,5 +135,13 @@ function xmldb_quiz_upgrade($oldversion) {
     // Automatically generated Moodle v5.3.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2026101600) {
+        // Fix random questions that point at the wrong question bank after a restore.
+        \core_question\question_reference_manager::fix_set_references_questions_context('mod_quiz');
+
+        // Quiz savepoint reached.
+        upgrade_mod_savepoint(true, 2026101600, 'quiz');
+    }
+
     return true;
 }
