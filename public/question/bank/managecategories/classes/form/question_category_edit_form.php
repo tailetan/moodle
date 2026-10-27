@@ -250,7 +250,6 @@ class question_category_edit_form extends \core_form\dynamic_form {
             $record,
             context::instance_by_id($record->contextid),
             $values->cmid ?? 0,
-            $values->courseid ?? 0,
         );
 
         return [
@@ -292,15 +291,11 @@ class question_category_edit_form extends \core_form\dynamic_form {
 
     #[\Override]
     protected function get_page_url_for_dynamic_submission(): moodle_url {
+        // The courseid is deprecated, category links with it redirect to the question banks page.
         $params = [];
         $cmid = isset($this->_ajaxformdata['cmid']) ? (int)$this->_ajaxformdata['cmid'] : 0;
-        $courseid = isset($this->_ajaxformdata['courseid']) ? (int)$this->_ajaxformdata['courseid'] : 0;
         if ($cmid !== 0) {
             $params['cmid'] = $cmid;
-        }
-
-        if ($courseid !== 0) {
-            $params['courseid'] = $courseid;
         }
         return new moodle_url('/question/bank/managecategories/category.php', $params);
     }
