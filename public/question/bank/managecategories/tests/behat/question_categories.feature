@@ -53,6 +53,36 @@ Feature: A teacher can put questions in categories in the question bank
     And I press "Add category"
     And the "Parent category" select box should contain "'Test' & 'display' [newcatidnumber]"
 
+  Scenario: The questions of a newly created question category can be viewed without reloading the page
+    Given I am on the "Qbank 1" "core_question > question categories" page
+    And I press "Add category"
+    And I set the field "Name" to "New category"
+    And I click on "Add category" "button" in the "Add category" "dialogue"
+    When I click on "New category" "link" in the "New category" "list_item"
+    Then I should not see "Question banks in this course"
+    And "Create a new question ..." "button" should exist
+
+  Scenario: A newly created question category can be deleted without reloading the page
+    Given I am on the "Qbank 1" "core_question > question categories" page
+    And I press "Add category"
+    And I set the field "Name" to "New category"
+    And I click on "Add category" "button" in the "Add category" "dialogue"
+    When I open the action menu in "New category" "list_item"
+    And I choose "Delete" in the open action menu
+    And I click on "Delete" "button" in the "Delete" "dialogue"
+    Then I should see "Default for Qbank 1"
+    And I should not see "New category"
+
+  Scenario: A newly created question category can be exported without reloading the page
+    Given I am on the "Qbank 1" "core_question > question categories" page
+    And I press "Add category"
+    And I set the field "Name" to "New category"
+    And I click on "Add category" "button" in the "Add category" "dialogue"
+    When I open the action menu in "New category" "list_item"
+    And I choose "Export as Moodle XML" in the open action menu
+    Then I should not see "Question banks in this course"
+    And I should see "Export questions to file"
+
   Scenario: A question category can be edited
     When I am on the "Qbank 1" "core_question > question categories" page
     # There have been bugs which only happened if a question category was not empty, so add a question.
